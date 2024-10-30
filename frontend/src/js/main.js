@@ -32,6 +32,55 @@ function Nikki_move_next() {
 function Nikki_move_today() {
     Nikki_move_index = 0;
 }
+function Nikki_move_prev_month() {
+    if (Nikki_data[Nikki_move_index].Date.Year == 0) {
+        Nikki_move_prev();
+        return;
+    }
+    let target_nikki_date = new Date(
+        Nikki_data[Nikki_move_index].Date.Year,
+        Nikki_data[Nikki_move_index].Date.Month,
+        Nikki_data[Nikki_move_index].Date.Day,
+    );
+    target_nikki_date.setMonth(target_nikki_date.getMonth() - 1);
+
+    while (
+        target_nikki_date < (new Date(
+            Nikki_data[Nikki_move_index].Date.Year,
+            Nikki_data[Nikki_move_index].Date.Month,
+            Nikki_data[Nikki_move_index].Date.Day,
+        ))
+        && Nikki_move_index < Nikki_data.length - 1) {
+        Nikki_move_index++;
+    }
+    if (Nikki_move_index >= Nikki_data.length)
+        Nikki_move_index = Nikki_data.length - 1;
+}
+
+function Nikki_move_next_month() {
+    if (Nikki_data[Nikki_move_index].Date.Year == 0) {
+        Nikki_move_next();
+        return;
+    }
+    let target_nikki_date = new Date(
+        Nikki_data[Nikki_move_index].Date.Year,
+        Nikki_data[Nikki_move_index].Date.Month,
+        Nikki_data[Nikki_move_index].Date.Day,
+    );
+    target_nikki_date.setMonth(target_nikki_date.getMonth() + 1);
+
+    while (
+        target_nikki_date > (new Date(
+            Nikki_data[Nikki_move_index].Date.Year,
+            Nikki_data[Nikki_move_index].Date.Month,
+            Nikki_data[Nikki_move_index].Date.Day,
+        ))
+        && Nikki_move_index > 0) {
+        Nikki_move_index--;
+    }
+    if (Nikki_move_index < 0)
+        Nikki_move_index = 0;
+}
 
 async function Select_Nikki_dir() {
     const path = await Select_Nikki_dir_Dialog();
@@ -58,7 +107,6 @@ function Update() {
 
 async function Init() {
     Nikki_data = await Get_nikki();
-    console.log(Nikki_data)
     if (Nikki_data != null)
         Update_nikki_front(Nikki_data[0]);
 
@@ -75,6 +123,8 @@ document.addEventListener("DOMContentLoaded", function () {
     Init();
     document.getElementById("Nikki_move_prev").onclick = Nikki_move_prev;
     document.getElementById("Nikki_move_next").onclick = Nikki_move_next;
+    document.getElementById("Nikki_move_prev_month").onclick = Nikki_move_prev_month;
+    document.getElementById("Nikki_move_next_month").onclick = Nikki_move_next_month;
     document.getElementById("Nikki_move_today").onclick = Nikki_move_today;
     document.getElementById("Select_Nikki_dir_button").onclick = Select_Nikki_dir;
 
