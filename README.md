@@ -4,7 +4,7 @@
 
 wailsで作られたシンプルな日記帳ソフトウェア
 
-![img](img/img1.png)
+![img](img/img3.png)
 
 <br>
 <br>
