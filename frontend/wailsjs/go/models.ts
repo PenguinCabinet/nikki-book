@@ -20,6 +20,7 @@ export namespace main {
 	    Fname: string;
 	    Date: Nikki_date_t;
 	    Content: string;
+	    Is_loading: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new Nikki_t(source);
@@ -30,6 +31,7 @@ export namespace main {
 	        this.Fname = source["Fname"];
 	        this.Date = this.convertValues(source["Date"], Nikki_date_t);
 	        this.Content = source["Content"];
+	        this.Is_loading = source["Is_loading"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

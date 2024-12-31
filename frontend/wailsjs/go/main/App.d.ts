@@ -6,19 +6,23 @@ export function Add_nikki_today():Promise<void>;
 
 export function Get_dir_fnames(arg1:string):Promise<Array<string>>;
 
-export function Get_nikki():Promise<Array<main.Nikki_t>>;
+export function Get_nikki(arg1:number):Promise<main.Nikki_t>;
+
+export function Get_nikki_count():Promise<number>;
 
 export function Get_setting():Promise<main.Setting_t>;
 
 export function Load_nikki():Promise<void>;
 
+export function Load_nikki_content():Promise<void>;
+
 export function Load_setting():Promise<void>;
 
-export function Parse_nikki_file(arg1:string):Promise<main.Nikki_t>;
+export function Parse_nikki_file_fname(arg1:string):Promise<main.Nikki_t>;
 
 export function Select_Nikki_dir_Dialog():Promise<string>;
 
-export function Set_nikki(arg1:Array<main.Nikki_t>):Promise<void>;
+export function Set_nikki(arg1:number,arg2:main.Nikki_t):Promise<void>;
 
 export function Set_setting(arg1:main.Setting_t):Promise<void>;
 

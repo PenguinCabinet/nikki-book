@@ -20,6 +20,8 @@ func main() {
 	app.Add_nikki_today()
 
 	app.Load_nikki()
+	app.Nikki_data[0].Is_loading = false
+	//app.Load_nikki_content()
 
 	// Create application with options
 	err := wails.Run(&options.App{
