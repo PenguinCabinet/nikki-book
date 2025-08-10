@@ -13,8 +13,29 @@ let Nikki_data = []
 let Setting_data = {}
 let Nikki_index = 0
 
+const day_string_arr = [
+    "(日)",
+    "(月)",
+    "(火)",
+    "(水)",
+    "(木)",
+    "(金)",
+    "(土)",
+];
+
 function Update_nikki_front(data) {
-    document.getElementById("Nikki-Title").innerText = data.Fname;
+    const day = day_string_arr[
+        new Date(
+            data.Date.Year,
+            data.Date.Month - 1,
+            data.Date.Day,
+        ).getDay()
+    ];
+
+    document.getElementById("Nikki-Title").innerText =
+        `${data.Fname} ${day}`
+        ;
+
     document.getElementById("Nikki-Content").value = data.Content;
 }
 
