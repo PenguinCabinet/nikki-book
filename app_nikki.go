@@ -15,9 +15,10 @@ type Nikki_date_t struct {
 }
 
 type Nikki_t struct {
-	Fname   string
-	Date    Nikki_date_t
-	Content string
+	Fname      string
+	Date       Nikki_date_t
+	Content    string
+	Is_loading bool
 }
 
 func (a *App) Add_nikki_today() {
@@ -40,17 +41,14 @@ func (a *App) Add_nikki_today() {
 }
 
 func (a *App) Parse_nikki_file(fname string) Nikki_t {
-	content, err := ioutil.ReadFile(path.Join(a.Setting_data.Nikki_dir, fname))
-	if err != nil {
-		panic(err)
-	}
 
 	Fname_format_golang := TimeFormat_conv(a.Setting_data.Fname_format)
 
-	t, err := time.Parse(Fname_format_golang, fname)
+	t, _ := time.Parse(Fname_format_golang, fname)
 
 	return Nikki_t{
-		Fname: fname, Content: string(content),
+		Fname: fname, Content: "",
+		Is_loading: false,
 		Date: Nikki_date_t{
 			Year:  t.Year(),
 			Month: int(t.Month()),
@@ -77,12 +75,21 @@ func (a *App) Write_nikki_file(v Nikki_t) {
 
 func (a *App) Set_nikki(v []Nikki_t) {
 	for i, e := range v {
-		if a.Nikki_data[i].Content != e.Content {
-			a.Nikki_data[i].Content = e.Content
+		if e.Is_loading {
+			if a.Nikki_data[i].Content != e.Content {
+				a.Nikki_data[i].Content = e.Content
+				a.Write_nikki_file(a.Nikki_data[i])
+			}
+		}
+	}
+}
+func (a *App) Set_nikki_by_index(v Nikki_t, i int) {
+	if a.Nikki_data[i].Is_loading {
+		if a.Nikki_data[i].Content != v.Content {
+			a.Nikki_data[i].Content = v.Content
 			a.Write_nikki_file(a.Nikki_data[i])
 		}
 	}
-
 }
 
 func (a *App) Load_nikki() {
@@ -103,7 +110,30 @@ func (a *App) Load_nikki() {
 	a.Nikki_data = reslut
 }
 
+func (a *App) Get_nikki_length() int {
+
+	return len(a.Nikki_data)
+}
+
+func (a *App) Check_Nikki_null() bool {
+	//fmt.Printf("%v\n", a.Nikki_data)
+	return a.Nikki_data == nil
+}
+
 func (a *App) Get_nikki() []Nikki_t {
 
 	return a.Nikki_data
+}
+
+func (a *App) Get_nikki_by_index(i int) Nikki_t {
+	return a.Nikki_data[i]
+}
+
+func (a *App) Loading_nikki_by_index(i int) {
+	content, err := ioutil.ReadFile(path.Join(a.Setting_data.Nikki_dir, a.Nikki_data[i].Fname))
+	if err != nil {
+		panic(err)
+	}
+	a.Nikki_data[i].Content = string(content)
+	a.Nikki_data[i].Is_loading = true
 }

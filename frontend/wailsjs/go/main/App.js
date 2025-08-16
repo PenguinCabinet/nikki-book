@@ -6,12 +6,24 @@ export function Add_nikki_today() {
   return window['go']['main']['App']['Add_nikki_today']();
 }
 
+export function Check_Nikki_null() {
+  return window['go']['main']['App']['Check_Nikki_null']();
+}
+
 export function Get_dir_fnames(arg1) {
   return window['go']['main']['App']['Get_dir_fnames'](arg1);
 }
 
 export function Get_nikki() {
   return window['go']['main']['App']['Get_nikki']();
+}
+
+export function Get_nikki_by_index(arg1) {
+  return window['go']['main']['App']['Get_nikki_by_index'](arg1);
+}
+
+export function Get_nikki_length() {
+  return window['go']['main']['App']['Get_nikki_length']();
 }
 
 export function Get_setting() {
@@ -26,6 +38,10 @@ export function Load_setting() {
   return window['go']['main']['App']['Load_setting']();
 }
 
+export function Loading_nikki_index(arg1) {
+  return window['go']['main']['App']['Loading_nikki_index'](arg1);
+}
+
 export function Parse_nikki_file(arg1) {
   return window['go']['main']['App']['Parse_nikki_file'](arg1);
 }
@@ -36,6 +52,10 @@ export function Select_Nikki_dir_Dialog() {
 
 export function Set_nikki(arg1) {
   return window['go']['main']['App']['Set_nikki'](arg1);
+}
+
+export function Set_nikki_by_index(arg1, arg2) {
+  return window['go']['main']['App']['Set_nikki_by_index'](arg1, arg2);
 }
 
 export function Set_setting(arg1) {

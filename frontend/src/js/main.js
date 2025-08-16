@@ -7,7 +7,7 @@ import * as bootstrap from 'bootstrap'
 // Supports weights 100-900
 import '@fontsource/noto-sans-jp';
 
-import { Get_nikki, Get_setting, Set_nikki, Set_setting, Select_Nikki_dir_Dialog } from '../../wailsjs/go/main/App.js'
+import { Get_setting, Set_setting, Select_Nikki_dir_Dialog, Get_nikki_length, Get_nikki_by_index, Check_Nikki_null, Set_nikki_by_index, Loading_nikki_by_index } from '../../wailsjs/go/main/App.js'
 
 let Nikki_data = []
 let Setting_data = {}
@@ -23,13 +23,17 @@ const day_string_arr = [
     "(土)",
 ];
 
+function nikki_to_Date(v) {
+    return new Date(
+        v.Date.Year,
+        v.Date.Month - 1,
+        v.Date.Day,
+    )
+}
+
 function Update_nikki_front(data) {
     const day = day_string_arr[
-        new Date(
-            data.Date.Year,
-            data.Date.Month - 1,
-            data.Date.Day,
-        ).getDay()
+        nikki_to_Date(data).getDay()
     ];
 
     document.getElementById("Nikki-Title").innerText =
@@ -40,10 +44,10 @@ function Update_nikki_front(data) {
 }
 
 let Nikki_move_index = 0;
-function Nikki_move_prev() {
+async function Nikki_move_prev() {
     Nikki_move_index++;
-    if (Nikki_move_index >= Nikki_data.length)
-        Nikki_move_index = Nikki_data.length - 1;
+    if (Nikki_move_index >= (await Get_nikki_length()))
+        Nikki_move_index = (await Get_nikki_length()) - 1;
 }
 function Nikki_move_next() {
     Nikki_move_index--;
@@ -53,49 +57,43 @@ function Nikki_move_next() {
 function Nikki_move_today() {
     Nikki_move_index = 0;
 }
-function Nikki_move_prev_month() {
-    if (Nikki_data[Nikki_move_index].Date.Year == 0) {
+
+async function Nikki_move_prev_month() {
+    if ((await Get_nikki_by_index(Nikki_move_index)).Date.Year == 0) {
         Nikki_move_prev();
         return;
     }
-    let target_nikki_date = new Date(
-        Nikki_data[Nikki_move_index].Date.Year,
-        Nikki_data[Nikki_move_index].Date.Month,
-        Nikki_data[Nikki_move_index].Date.Day,
+    let target_nikki_date = nikki_to_Date(
+        (await Get_nikki_by_index(Nikki_move_index))
     );
     target_nikki_date.setMonth(target_nikki_date.getMonth() - 1);
 
     while (
-        target_nikki_date < (new Date(
-            Nikki_data[Nikki_move_index].Date.Year,
-            Nikki_data[Nikki_move_index].Date.Month,
-            Nikki_data[Nikki_move_index].Date.Day,
-        ))
-        && Nikki_move_index < Nikki_data.length - 1) {
+        target_nikki_date < nikki_to_Date(
+            (await Get_nikki_by_index(Nikki_move_index))
+        )
+        && Nikki_move_index < (await Get_nikki_length()) - 1
+    ) {
         Nikki_move_index++;
     }
-    if (Nikki_move_index >= Nikki_data.length)
-        Nikki_move_index = Nikki_data.length - 1;
+    if (Nikki_move_index >= (await Get_nikki_length()))
+        Nikki_move_index = (await Get_nikki_length()) - 1;
 }
 
-function Nikki_move_next_month() {
-    if (Nikki_data[Nikki_move_index].Date.Year == 0) {
+async function Nikki_move_next_month() {
+    if ((await Get_nikki_by_index(Nikki_move_index)).Date.Year == 0) {
         Nikki_move_next();
         return;
     }
-    let target_nikki_date = new Date(
-        Nikki_data[Nikki_move_index].Date.Year,
-        Nikki_data[Nikki_move_index].Date.Month,
-        Nikki_data[Nikki_move_index].Date.Day,
+    let target_nikki_date = nikki_to_Date(
+        (await Get_nikki_by_index(Nikki_move_index))
     );
     target_nikki_date.setMonth(target_nikki_date.getMonth() + 1);
 
     while (
-        target_nikki_date > (new Date(
-            Nikki_data[Nikki_move_index].Date.Year,
-            Nikki_data[Nikki_move_index].Date.Month,
-            Nikki_data[Nikki_move_index].Date.Day,
-        ))
+        target_nikki_date > nikki_to_Date(
+            (await Get_nikki_by_index(Nikki_move_index))
+        )
         && Nikki_move_index > 0) {
         Nikki_move_index--;
     }
@@ -109,14 +107,20 @@ async function Select_Nikki_dir() {
         document.getElementById("Nikki_dir").value = path;
 }
 
-function Update() {
-    if (Nikki_data != null) {
+async function Update() {
+    if (!(await Check_Nikki_null())) {
+        let Nikki_data_temp = await Get_nikki_by_index(Nikki_index);
+        if (Nikki_data_temp.Is_loading) {
+            Nikki_data_temp.Content = document.getElementById("Nikki-Content").value;
+            await Set_nikki_by_index(Nikki_data_temp, Nikki_index);
+        }
 
-        Nikki_data[Nikki_index].Content = document.getElementById("Nikki-Content").value;
-        Set_nikki(Nikki_data);
         if (Nikki_move_index != Nikki_index) {
             Nikki_index = Nikki_move_index
-            Update_nikki_front(Nikki_data[Nikki_index]);
+            if (!(await Get_nikki_by_index(Nikki_index)).Is_loading) {
+                await Loading_nikki_by_index(Nikki_index)
+            }
+            Update_nikki_front((await Get_nikki_by_index(Nikki_index)));
         }
     }
 
@@ -127,9 +131,10 @@ function Update() {
 }
 
 async function Init() {
-    Nikki_data = await Get_nikki();
-    if (Nikki_data != null)
-        Update_nikki_front(Nikki_data[0]);
+    if (!(await Check_Nikki_null())) {
+        await Loading_nikki_by_index(Nikki_index)
+        Update_nikki_front((await Get_nikki_by_index(Nikki_index)));
+    }
 
     Setting_data = await Get_setting();
     document.getElementById("Nikki_dir").value = Setting_data.Nikki_dir;
