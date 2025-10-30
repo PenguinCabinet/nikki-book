@@ -35,7 +35,7 @@ jobs:
         working-directory: build
         run: zip -r nikki-book-windows.zip nikki-book
       - name: Remove build/nikki-book
-        working-directory: rm -rf build/nikki-book
+        run: rm -rf build/nikki-book
       - name: wails build
         run: wails build -platform linux/amd64
       - name: cp README.md
