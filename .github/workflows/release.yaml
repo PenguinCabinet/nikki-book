@@ -34,8 +34,22 @@ jobs:
       - name: Make zip file
         working-directory: build
         run: zip -r nikki-book-windows.zip nikki-book
+      - name: Remove build/nikki-book
+        working-directory: rm -rf build/nikki-book
+      - name: wails build
+        run: wails build -platform linux/amd64
+      - name: cp README.md
+        run: cp README.md build/bin
+      - name: Rename build/bin
+        working-directory: build
+        run: mv bin nikki-book
+      - name: Make zip file
+        working-directory: build
+        run: zip -r nikki-book-linux.zip nikki-book
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: build/nikki-book-windows.zip
+          files: |
+            build/nikki-book-windows.zip
+            build/nikki-book-linux.zip
