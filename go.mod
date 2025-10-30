@@ -1,4 +1,4 @@
-module nikki-book
+module github.com/PenguinCabinet/nikki-book
 
 go 1.22.0
 
